@@ -95,7 +95,7 @@ function generateComposeService(idx, tester_ip) {
   if (new_service.networks?.default?.ipv4_address) {
     new_service.networks.default.ipv4_address = tester_ip;
   } else if (new_service.networks?.default?.aliases) {
-    new_service.networks.default.aliases = tester_ip;
+    new_service.networks.default.aliases[0] = tester_ip;
   }
 
   // Change config file (volume)
