@@ -7,7 +7,7 @@ services:
     build:
       context: ./
     volumes:
-      - ${TESTER_PATH}/config/:/app/config
+      - ${TESTER_PATH}/${CONFIG_PATH}/:/app/config
       - ${TESTER_PATH}/${IN_COMPOSE}:/app/docker-compose.yaml
       - ${TESTER_PATH}/${OUT_COMPOSE}:/app/docker-multi.yaml
     environment:
