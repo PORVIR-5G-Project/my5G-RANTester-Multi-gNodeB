@@ -1,0 +1,16 @@
+version: "3"
+
+services:
+  multi-gnb:
+    container_name: multi-gnb
+    network_mode: "bridge"
+    build:
+      context: ./
+    volumes:
+      - ${TESTER_PATH}/config/:/app/config
+      - ${TESTER_PATH}/${IN_COMPOSE}:/app/docker-compose.yaml
+      - ${TESTER_PATH}/${OUT_COMPOSE}:/app/docker-multi.yaml
+    environment:
+      - NUM_UE=${NUM_UE}
+      - NUM_GNB=${NUM_GNB}
+      - CONFIG_FILE=${CONFIG_FILE}
