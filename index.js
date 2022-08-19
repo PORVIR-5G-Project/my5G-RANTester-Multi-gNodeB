@@ -21,7 +21,9 @@ const tester_config = yaml.parse(tester_config_raw);
 const docker_compose_raw = fs.readFileSync(ORIG_COMPOSE_NAME, "utf8");
 const docker_compose = yaml.parse(docker_compose_raw);
 const tester_service = JSON.parse(JSON.stringify(docker_compose.services.my5grantester));
-docker_compose.services = {}; // Clear services
+
+// Remove the original tester service, but keep other services
+delete docker_compose.services.my5grantester;
 
 // Get the initial gNB ID
 const gnbid_str = tester_config.gnodeb.plmnlist.gnbid;
