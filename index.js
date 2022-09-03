@@ -63,20 +63,24 @@ function generateConfig(idx) {
   config.ue.msin = String(msin + idx * num_ue_per_gnb).padStart(msin_len, "0");
 
   // Check if it's a valid IPv4 or a hostname
-  let tester_ip = config.gnodeb.controlif.ip;
-  if (net.isIP(tester_ip) == 4) {
-    const ip_split = tester_ip.split(".");
+  let tester_ip = { control: config.gnodeb.controlif.ip, data: config.gnodeb.dataif.ip };
+  if (net.isIP(tester_ip.control) == 4) {
+    const ip_split_ctr = tester_ip.control.split(".");
+    const ip_split_data = tester_ip.data.split(".");
     // IP address: XXX.YYY.ZZZ.50+
-    tester_ip = `${ip_split[0]}.${ip_split[1]}.${ip_split[2]}.${50 + idx}`;
+    tester_ip.control = `${ip_split_ctr[0]}.${ip_split_ctr[1]}.${ip_split_ctr[2]}.${50 + idx}`;
+    tester_ip.data = `${ip_split_data[0]}.${ip_split_data[1]}.${ip_split_data[2]}.${50 + idx}`;
   } else {
-    const ip_split = tester_ip.split(".");
+    const ip_split_ctr = tester_ip.control.split(".");
+    const ip_split_data = tester_ip.data.split(".");
     // Hostname: xxx0+.yyy.zzz
-    tester_ip = `${ip_split[0] + idx}.${ip_split.slice(1).join(".")}`;
+    tester_ip.control = `${ip_split_ctr[0] + idx}.${ip_split_ctr.slice(1).join(".")}`;
+    tester_ip.data = `${ip_split_data[0] + idx}.${ip_split_data.slice(1).join(".")}`;
   }
 
   // Change IP/Hostname
-  config.gnodeb.controlif.ip = tester_ip;
-  config.gnodeb.dataif.ip = tester_ip;
+  config.gnodeb.controlif.ip = tester_ip.control;
+  config.gnodeb.dataif.ip = tester_ip.data;
 
   // Save new file
   const cfg_data = yaml.stringify(config);
@@ -93,11 +97,14 @@ function generateComposeService(idx, tester_ip) {
   // Append the index to the container name
   new_service.container_name += idx;
 
-  // Add the new tester IP/Hoestname
+  // Add the new tester IP/Hostname
   if (new_service.networks?.default?.ipv4_address) {
-    new_service.networks.default.ipv4_address = tester_ip;
+    new_service.networks.default.ipv4_address = tester_ip.control;
   } else if (new_service.networks?.default?.aliases) {
-    new_service.networks.default.aliases[0] = tester_ip;
+    new_service.networks.default.aliases[0] = tester_ip.control;
+  } else if (new_service.networks?.public_net?.ipv4_address) {
+    new_service.networks.public_net.ipv4_address = tester_ip.control;
+    new_service.networks.public_net_access.ipv4_address = tester_ip.data;
   }
 
   // Change config file (volume)
